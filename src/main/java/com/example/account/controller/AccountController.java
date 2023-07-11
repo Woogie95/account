@@ -21,7 +21,7 @@ public class AccountController {
 
     @GetMapping("/create")
     public CreateAccount.Response createAccount(@RequestBody @Valid CreateAccount.Request createRequest) {
-        accountService.createAccount();
+        accountService.createAccount(createRequest.getUserId(), createRequest.getInitialBalance());
         return "success";
     }
 

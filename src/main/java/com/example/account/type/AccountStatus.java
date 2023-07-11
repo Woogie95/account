@@ -1,4 +1,4 @@
-package com.example.account.entity;
+package com.example.account.type;
 
 public enum AccountStatus {
     IN_USE,
