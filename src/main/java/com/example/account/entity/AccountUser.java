@@ -20,7 +20,7 @@ public class AccountUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String userName;
 
     @CreatedDate
     private LocalDateTime createdAt;

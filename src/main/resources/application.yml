@@ -9,13 +9,21 @@ spring:
     password: tjddnr12
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
+
     defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.MySQL5Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     open-in-view: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
         show_sql: true
+
+  # sql file add
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:data.sql
 
