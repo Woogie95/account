@@ -2,12 +2,14 @@ package com.example.account.controller;
 
 import com.example.account.dto.AccountDTO;
 import com.example.account.dto.CreateAccountDTO;
+import com.example.account.dto.DeleteAccountDTO;
 import com.example.account.entity.Account;
 import com.example.account.type.AccountStatus;
 import com.example.account.service.AccountService;
 import com.example.account.service.RedisTestService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,9 +21,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,13 +59,36 @@ class AccountControllerTest {
         mockMvc.perform(post("/account")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
-                        new CreateAccountDTO.CreateAccountRequest(1L, 100L)
+                        new CreateAccountDTO.Request(1L, 100L)
                 )))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.accountNumber").value("1234567890"))
                 .andDo(print());
+    }
 
+    @Test
+    @DisplayName("계좌 해제 테스트")
+    void successDeleteAccount() throws Exception {
+        // given
+        given(accountService.deleteAccount(anyLong(), anyString()))
+                .willReturn(AccountDTO.builder()
+                        .userId(1L)
+                        .accountNumber("1234567890")
+                        .registeredAt(LocalDateTime.now())
+                        .unRegisteredAt(LocalDateTime.now())
+                        .build());
+        // when
+        // then
+        mockMvc.perform(delete("/account")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new DeleteAccountDTO.Request(1L, "1000000000")
+                        )))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.accountNumber").value("1234567890"))
+                .andDo(print());
     }
 
 

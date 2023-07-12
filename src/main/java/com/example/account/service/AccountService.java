@@ -60,12 +60,14 @@ public class AccountService {
                 .orElseThrow(() -> new AccountException(ErrorCode.USER_NOT_FOUND));
 
         Account account = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new AccountException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AccountException(ErrorCode.ACCOUNT_NOT_FOUND));
 
         validateDeleteAccount(accountUser, account);
 
         account.setAccountStatus(AccountStatus.UN_USE);
         account.setUnRegisteredAt(LocalDateTime.now());
+
+        accountRepository.save(account); // 테스트 코드에서 위에 AccountStatus, UnRegisteredAt 테스트하기 위한 save 호출
         return AccountDTO.fromEntity(account);
     }
 
@@ -73,7 +75,7 @@ public class AccountService {
         if (!Objects.equals(accountUser.getId(), account.getAccountUser().getId())) {
             throw new AccountException(ErrorCode.USER_ACCOUNT_UN_MATCH);
         }
-        if (account.getAccountStatus().equals(AccountStatus.UN_USE)) {
+        if (account.getAccountStatus() == AccountStatus.UN_USE) {
             throw new AccountException(ErrorCode.ACCOUNT_ALREADY_UNREGISTERED);
         }
         if (account.getBalance() > 0) {
