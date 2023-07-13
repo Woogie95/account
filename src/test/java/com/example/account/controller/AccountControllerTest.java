@@ -18,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -57,10 +59,10 @@ class AccountControllerTest {
         // when
         // then
         mockMvc.perform(post("/account")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(
-                        new CreateAccountDTO.Request(1L, 100L)
-                )))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new CreateAccountDTO.Request(1L, 100L)
+                        )))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.accountNumber").value("1234567890"))
@@ -107,6 +109,40 @@ class AccountControllerTest {
                 .andDo(print())
                 .andExpect(jsonPath("$.accountNumber").value("3456"))
                 .andExpect(jsonPath("$.accountStatus").value("IN_USE"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("해당 유저 계좌 전부 가져오기")
+    void successGetAccountsByUserId() throws Exception {
+        // given
+        List<AccountDTO> accountDTOList = Arrays.asList(
+                AccountDTO.builder()
+                        .accountNumber("1234567890")
+                        .balance(10000L)
+                        .build(),
+                AccountDTO.builder()
+                        .accountNumber("1234567891")
+                        .balance(1000L)
+                        .build(),
+                AccountDTO.builder()
+                        .accountNumber("1234567892")
+                        .balance(100L)
+                        .build());
+
+        given(accountService.getAccountsByUserId(anyLong()))
+                .willReturn(accountDTOList);
+
+        // when
+        // then
+        mockMvc.perform(get("/account?user_id=1"))
+                .andDo(print())
+                .andExpect(jsonPath("$[0].accountNumber").value("1234567890"))
+                .andExpect(jsonPath("$[0].balance").value(10000L))
+                .andExpect(jsonPath("$[1].accountNumber").value("1234567891"))
+                .andExpect(jsonPath("$[1].balance").value(1000L))
+                .andExpect(jsonPath("$[2].accountNumber").value("1234567892"))
+                .andExpect(jsonPath("$[2].balance").value(100L))
                 .andExpect(status().isOk());
     }
 

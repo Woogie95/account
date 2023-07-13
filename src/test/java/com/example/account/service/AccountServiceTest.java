@@ -16,8 +16,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import static com.example.account.type.ErrorCode.USER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -129,7 +132,7 @@ class AccountServiceTest {
                 () -> accountService.createAccount(1L, 1000L));
 
         // then
-        assertEquals(ErrorCode.USER_NOT_FOUND, accountException.getErrorCode());
+        assertEquals(USER_NOT_FOUND, accountException.getErrorCode());
     }
 
     @Test
@@ -144,7 +147,7 @@ class AccountServiceTest {
                 () -> accountService.deleteAccount(1L, "1234567890"));
 
         // then
-        assertEquals(ErrorCode.USER_NOT_FOUND, accountException.getErrorCode());
+        assertEquals(USER_NOT_FOUND, accountException.getErrorCode());
     }
 
     @Test
@@ -276,5 +279,60 @@ class AccountServiceTest {
         assertEquals("Minus", exception.getMessage());
     }
 
+    @Test
+    @DisplayName("해당 유저의 모든 계좌 가져오기")
+    void successGetAccountsByUserId() {
+        // given
+        AccountUser user = AccountUser.builder()
+                .id(15L)
+                .userName("뽀로로")
+                .build();
 
+        List<Account> accountList = Arrays.asList(
+                Account.builder()
+                        .accountUser(user)
+                        .accountNumber("1234567890")
+                        .balance(10000L)
+                        .build(),
+                Account.builder()
+                        .accountUser(user)
+                        .accountNumber("1111111111")
+                        .balance(11111L)
+                        .build(),
+                Account.builder()
+                        .accountUser(user)
+                        .accountNumber("2222222222")
+                        .balance(22222L)
+                        .build());
+
+        given(accountUserRepository.findById(anyLong()))
+                .willReturn(Optional.of(user));
+        given(accountRepository.findByAccountUser(any()))
+                .willReturn(accountList);
+        // when
+        List<AccountDTO> accountDTOList = accountService.getAccountsByUserId(1L);
+
+        // then
+        assertEquals(3, accountDTOList.size());
+        assertEquals("1234567890", accountDTOList.get(0).getAccountNumber());
+        assertEquals(10000L, accountDTOList.get(0).getBalance());
+        assertEquals("1111111111", accountDTOList.get(1).getAccountNumber());
+        assertEquals(11111L, accountDTOList.get(1).getBalance());
+        assertEquals("2222222222", accountDTOList.get(2).getAccountNumber());
+        assertEquals(22222L, accountDTOList.get(2).getBalance());
+    }
+
+    @Test
+    @DisplayName("해당 유저의 모든 계좌 가져오기 실패")
+    void failedToGetAccounts() {
+        // given
+        given(accountUserRepository.findById(anyLong()))
+                .willReturn(Optional.empty());
+        // when
+        AccountException exception = assertThrows(AccountException.class,
+                () -> accountService.getAccountsByUserId(1L));
+
+        // then
+        assertEquals(USER_NOT_FOUND, exception.getErrorCode());
+    }
 }
