@@ -335,4 +335,32 @@ class AccountServiceTest {
         // then
         assertEquals(USER_NOT_FOUND, exception.getErrorCode());
     }
+
+    @Test
+    @DisplayName("계좌 소유주 다름")
+    void deleteAccountFailed_userUnMatch() {
+        // given
+        AccountUser user = AccountUser.builder()
+                .id(10L)
+                .userName("루피")
+                .build();
+        AccountUser accountUser = AccountUser.builder()
+                .id(11L)
+                .userName("뽀로로")
+                .build();
+        given(accountUserRepository.findById(anyLong()))
+                .willReturn(Optional.of(user));
+        given(accountRepository.findByAccountNumber(anyString()))
+                .willReturn(Optional.of(Account.builder()
+                        .accountUser(accountUser)
+                        .balance(0L)
+                        .accountNumber("1000000001")
+                        .build()));
+        // when
+        AccountException exception = assertThrows(AccountException.class
+                , () -> accountService.deleteAccount(1L, "1000000003"));
+
+        // then
+        assertEquals(ErrorCode.USER_ACCOUNT_UN_MATCH, exception.getErrorCode());
+    }
 }

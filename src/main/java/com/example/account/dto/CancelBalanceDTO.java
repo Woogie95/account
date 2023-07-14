@@ -6,14 +6,13 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-public class UseBalanceDTO {
+public class CancelBalanceDTO {
     @Getter
     @Setter
     @AllArgsConstructor
     public static class Request {
-        @NotNull
-        @Min(1)
-        private Long userId;
+        @NotBlank
+        private String transactionId;
 
         @NotBlank
         @Size(min = 10, max = 10)
@@ -21,7 +20,7 @@ public class UseBalanceDTO {
 
         @NotNull
         @Min(10)
-        @Max( 10_000_000_000L)
+        @Max(10_000_000_000L)
         private Long amount;
     }
 

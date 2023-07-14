@@ -1,13 +1,13 @@
 package com.example.account.controller;
 
+import com.example.account.dto.CancelBalanceDTO;
+import com.example.account.dto.QueryTransactionResponse;
 import com.example.account.dto.UseBalanceDTO;
 import com.example.account.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 잔액 관련 컨트롤러
@@ -37,4 +37,22 @@ public class TransactionController {
             throw e;
         }
     }
+
+    @PostMapping("/transaction/cancel")
+    public CancelBalanceDTO.Response useBalance(@Valid @RequestBody CancelBalanceDTO.Request request) {
+        try {
+            return CancelBalanceDTO.Response.form(transactionService.cancelBalance(
+                    request.getTransactionId(), request.getAccountNumber(), request.getAmount()));
+        } catch (ArithmeticException e) {
+            log.error("Failed to use balance");
+            transactionService.saveFailedCancelTransaction(request.getAccountNumber(), request.getAmount());
+            throw e;
+        }
+    }
+
+    @GetMapping("/transaction/{transactionId}")
+    public QueryTransactionResponse queryTransaction(@PathVariable String transactionId) {
+        return QueryTransactionResponse.form(transactionService.queryTransaction(transactionId));
+    }
+
 }
