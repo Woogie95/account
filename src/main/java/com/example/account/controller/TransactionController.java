@@ -1,5 +1,6 @@
 package com.example.account.controller;
 
+import com.example.account.aop.AccountLock;
 import com.example.account.dto.CancelBalanceDTO;
 import com.example.account.dto.QueryTransactionResponse;
 import com.example.account.dto.UseBalanceDTO;
@@ -24,8 +25,10 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping("/transaction/use")
-    public UseBalanceDTO.Response useBalance(@Valid @RequestBody UseBalanceDTO.Request request) {
+    @AccountLock
+    public UseBalanceDTO.Response useBalance(@Valid @RequestBody UseBalanceDTO.Request request) throws InterruptedException {
         try {
+            Thread.sleep(5000L);
             return UseBalanceDTO.Response.form(transactionService.useBalance(
                     request.getUserId(), request.getAccountNumber(), request.getAmount()));
         } catch (ArithmeticException e) {
@@ -39,6 +42,7 @@ public class TransactionController {
     }
 
     @PostMapping("/transaction/cancel")
+    @AccountLock
     public CancelBalanceDTO.Response useBalance(@Valid @RequestBody CancelBalanceDTO.Request request) {
         try {
             return CancelBalanceDTO.Response.form(transactionService.cancelBalance(

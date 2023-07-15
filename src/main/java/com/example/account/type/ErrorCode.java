@@ -12,6 +12,7 @@ public enum ErrorCode {
     ACCOUNT_NOT_FOUND("계좌번호가 없습니다."),
     CANCEL_MUST_FULLY("부분 취소는 허용되지 않습니다."),
     TRANSACTION_NOT_FOUND("해당하이 거래가 없습니다."),
+    ACCOUNT_TRANSACTION_LOCK("해당 계좌는 사용중 입니다."),
     BALANCE_NOT_EMPTY("잔액이 있는 계좌는 해지할 수 없습니다."),
     AMOUNT_EXCEED_BALANCE("거래 금액이 계좌 잔액보다 큽니다."),
     USER_ACCOUNT_UN_MATCH("사용자와 계좌의 소유주가 다릅니다."),
