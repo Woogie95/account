@@ -2,12 +2,8 @@ package com.example.account.entity;
 
 import com.example.account.exception.AccountException;
 import com.example.account.type.AccountStatus;
-import com.example.account.type.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -20,12 +16,7 @@ import static com.example.account.type.ErrorCode.INVALID_REQUEST;
 @AllArgsConstructor
 @Builder
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-public class Account {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class Account extends BaseEntity {
     private String accountNumber;
 
     @Enumerated(EnumType.STRING)
@@ -36,12 +27,6 @@ public class Account {
     private LocalDateTime registeredAt;
 
     private LocalDateTime unRegisteredAt;
-
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 
     @ManyToOne
     private AccountUser accountUser;

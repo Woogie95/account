@@ -17,12 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-public class Transaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class Transaction extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
 
@@ -37,12 +32,7 @@ public class Transaction {
 
     private LocalDateTime transactedAt;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
     @ManyToOne
     private Account account;
+
 }
